@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .tabs, .sub-tabs {
+            margin-bottom: 10px;
+        }
+
+        .tab-button, .sub-tab-button {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .tab-button.active, .sub-tab-button.active {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .tab-content, .sub-tab-content {
+            display: none;
+        }
+
+        .tab-content.active, .sub-tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: calc(100% - 10px);
+        }
+
+        .departmentTabs {
+            margin-top: 20px;
+        }
+
+        .page, .formContent {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="buttons">
+            <button onclick="showPage('data')">Data</button>
+            <button onclick="showPage('department')">Department</button>
+        </div>
+
+        <!-- Data Section -->
+        <div id="dataPage" class="page" style="display: none;">
+            <h2>Enter and Manage Data</h2>
+            <label for="departmentSelect">Select Department:</label>
+            <select id="departmentSelect" name="department" onchange="promptLogin()">
+                <option value="">Select</option>
+                <option value="math">Math</option>
+                <option value="cs">Computer Science</option>
+            </select>
+
+            <!-- Tabs for each Department after Login -->
+            <div id="mathTabs" class="departmentTabs" style="display: none;">
+                <button class="sub-tab-button active" onclick="openFormTab('mathFacultyForm')">Faculty Form</button>
+                <button class="sub-tab-button" onclick="openFormTab('mathStudentForm')">Student Form</button>
+            </div>
+
+            <div id="csTabs" class="departmentTabs" style="display: none;">
+                <button class="sub-tab-button active" onclick="openFormTab('csFacultyForm')">Faculty Form</button>
+                <button class="sub-tab-button" onclick="openFormTab('csStudentForm')">Student Form</button>
+            </div>
+
+            <!-- Forms for Different Departments -->
+            <!-- Math Department Forms -->
+            <div id="mathFacultyForm" class="formContent" style="display: none;">
+                <h3>Math Department - Faculty Form</h3>
+                <form id="mathFacultyDataForm">
+                    <label for="facultyNameMath">Faculty Name:</label>
+                    <input type="text" id="facultyNameMath" name="facultyName" required><br>
+                    <label for="joiningYearMath">Joining Year:</label>
+                    <input type="number" id="joiningYearMath" name="joiningYear" required><br>
+                    <button type="button" onclick="saveFacultyData('math')">Submit Faculty</button>
+                </form>
+            </div>
+
+            <div id="mathStudentForm" class="formContent" style="display: none;">
+                <h3>Math Department - Student Form</h3>
+                <form id="mathStudentDataForm">
+                    <label for="studentNameMath">Student Name:</label>
+                    <input type="text" id="studentNameMath" name="studentName" required><br>
+                    <label for="enrollmentYearMath">Enrollment Year:</label>
+                    <input type="number" id="enrollmentYearMath" name="enrollmentYear" required><br>
+                    <button type="button" onclick="saveStudentData('math')">Submit Student</button>
+                </form>
+            </div>
+
+            <!-- Computer Science Department Forms -->
+            <div id="csFacultyForm" class="formContent" style="display: none;">
+                <h3>Computer Science Department - Faculty Form</h3>
+                <form id="csFacultyDataForm">
+                    <label for="facultyNameCs">Faculty Name:</label>
+                    <input type="text" id="facultyNameCs" name="facultyName" required><br>
+                    <label for="joiningYearCs">Joining Year:</label>
+                    <input type="number" id="joiningYearCs" name="joiningYear" required><br>
+                    <button type="button" onclick="saveFacultyData('cs')">Submit Faculty</button>
+                </form>
+            </div>
+
+            <div id="csStudentForm" class="formContent" style="display: none;">
+                <h3>Computer Science Department - Student Form</h3>
+                <form id="csStudentDataForm">
+                    <label for="studentNameCs">Student Name:</label>
+                    <input type="text" id="studentNameCs" name="studentName" required><br>
+                    <label for="enrollmentYearCs">Enrollment Year:</label>
+                    <input type="number" id="enrollmentYearCs" name="enrollmentYear" required><br>
+                    <button type="button" onclick="saveStudentData('cs')">Submit Student</button>
+                </form>
+            </div>
+
+            <!-- Table to Display Faculty/Student Data -->
+            <div id="dataList" class="data-list" style="display: none;">
+                <h3>Data Entries</h3>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Year</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- Data rows will go here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Department Section -->
+        <div id="departmentPage" class="page" style="display: none;">
+            <h2>Department Details</h2>
+            <div class="department-tabs">
+                <button onclick="showDepartmentDetails('math')">Math Department</button>
+                <button onclick="showDepartmentDetails('cs')">Computer Science Department</button>
+            </div>
+
+            <!-- Subtabs for Math Department -->
+            <div id="mathDepartmentDetails" class="departmentDetails" style="display: none;">
+                <h3>Math Department</h3>
+                <button class="sub-tab-button active" onclick="showFacultyData('math')">Faculty Data</button>
+                <button class="sub-tab-button" onclick="showStudentData('math')">Student Data</button>
+
+                <div id="mathFacultyData" class="sub-tab-content" style="display: none;">
+                    <h4>Faculty Data</h4>
+                    <table id="mathFacultyTable">
+                        <thead>
+                            <tr><th>Name</th><th>Joining Year</th></tr>
+                        </thead>
+                        <tbody id="mathFacultyDataBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="mathStudentData" class="sub-tab-content" style="display: none;">
+                    <h4>Student Data</h4>
+                    <table id="mathStudentTable">
+                        <thead>
+                            <tr><th>Name</th><th>Enrollment Year</th></tr>
+                        </thead>
+                        <tbody id="mathStudentDataBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Subtabs for Computer Science Department -->
+            <div id="csDepartmentDetails" class="departmentDetails" style="display: none;">
+                <h3>Computer Science Department</h3>
+                <button class="sub-tab-button active" onclick="showFacultyData('cs')">Faculty Data</button>
+                <button class="sub-tab-button" onclick="showStudentData('cs')">Student Data</button>
+
+                <div id="csFacultyData" class="sub-tab-content" style="display: none;">
+                    <h4>Faculty Data</h4>
+                    <table id="csFacultyTable">
+                        <thead>
+                            <tr><th>Name</th><th>Joining Year</th></tr>
+                        </thead>
+                        <tbody id="csFacultyDataBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="csStudentData" class="sub-tab-content" style="display: none;">
+                    <h4>Student Data</h4>
+                    <table id="csStudentTable">
+                        <thead>
+                            <tr><th>Name</th><th>Enrollment Year</th></tr>
+                        </thead>
+                        <tbody id="csStudentDataBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Fake username and password for each department
+    const departmentCredentials = {
+        math: { username: 'mathUser', password: 'mathPass' },
+        cs: { username: 'csUser', password: 'csPass' }
+    };
+
+    // Data structure to hold faculty and student data for each department
+    const departmentData = {
+        math: { faculty: [], students: [] },
+        cs: { faculty: [], students: [] }
+    };
+
+    let currentDepartment = null; // To track the currently selected department
+    let currentFormType = 'faculty'; // To track the currently active form type
+
+    // Function to show the selected page (Data, Department)
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+        document.getElementById(page + 'Page').style.display = 'block';
+    }
+
+    // Function to prompt login for the selected department
+    function promptLogin() {
+        const department = document.getElementById('departmentSelect').value;
+
+        if (department) {
+            const username = prompt("Enter username for " + department + " department:");
+            const password = prompt("Enter password for " + department + " department:");
+
+            if (username === departmentCredentials[department].username && password === departmentCredentials[department].password) {
+                alert("Login successful!");
+                displayDepartmentTabs(department);
+                currentDepartment = department; // Set the current department
+            } else {
+                alert("Invalid credentials for " + department + " department.");
+                document.getElementById('departmentSelect').value = '';  // Reset department selection
+            }
+        }
+    }
+
+    // Function to display department tabs after successful login
+    function displayDepartmentTabs(department) {
+        document.querySelectorAll('.departmentTabs').forEach(tab => tab.style.display = 'none');
+        document.querySelectorAll('.formContent').forEach(form => form.style.display = 'none');
+        document.getElementById(department + 'Tabs').style.display = 'block'; // Show department-specific tabs
+        document.getElementById(department + 'FacultyForm').style.display = 'block'; // Default to showing the Faculty Form
+        displayDataList(); // Display any saved data
+    }
+
+    // Function to open the relevant form and set current form type
+    function openFormTab(formId) {
+        document.querySelectorAll('.formContent').forEach(form => form.style.display = 'none');
+        document.getElementById(formId).style.display = 'block';
+
+        // Determine if the form is for faculty or students
+        if (formId.includes('Faculty')) {
+            currentFormType = 'faculty';
+        } else {
+            currentFormType = 'students';
+        }
+
+        displayDataList(); // Refresh the data list according to the current form type
+    }
+
+    // Function to save faculty data for a department
+    function saveFacultyData(department) {
+        const name = document.getElementById('facultyName' + department.charAt(0).toUpperCase() + department.slice(1)).value;
+        const year = document.getElementById('joiningYear' + department.charAt(0).toUpperCase() + department.slice(1)).value;
+
+        const newEntry = { name: name, year: year };
+        departmentData[department].faculty.push(newEntry);
+        alert('Faculty Data Saved for ' + department + ' department.');
+        document.getElementById(department + 'FacultyDataForm').reset();
+        saveToLocalStorage(); // Save to localStorage
+        displayDataList(); // Refresh the list after saving
+    }
+
+    // Function to save student data for a department
+    function saveStudentData(department) {
+        const name = document.getElementById('studentName' + department.charAt(0).toUpperCase() + department.slice(1)).value;
+        const year = document.getElementById('enrollmentYear' + department.charAt(0).toUpperCase() + department.slice(1)).value;
+
+        const newEntry = { name: name, year: year };
+        departmentData[department].students.push(newEntry);
+        alert('Student Data Saved for ' + department + ' department.');
+        document.getElementById(department + 'StudentDataForm').reset();
+        saveToLocalStorage(); // Save to localStorage
+        displayDataList(); // Refresh the list after saving
+    }
+
+    // Function to display the data list (faculty/students) in the Data tab
+    function displayDataList() {
+        const tableBody = document.getElementById('dataTableBody');
+        tableBody.innerHTML = ''; // Clear the table body
+
+        let rows = [];
+
+        // Filter by current form type
+        if (currentFormType === 'faculty' && currentDepartment) {
+            if (departmentData[currentDepartment].faculty.length > 0) {
+                departmentData[currentDepartment].faculty.forEach((item, index) => {
+                    rows.push(`
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.year}</td>
+                            <td>
+                                <button onclick="editRow('${currentDepartment}', 'faculty', ${index})">Edit</button>
+                                <button onclick="deleteRow('${currentDepartment}', 'faculty', ${index})">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+        } else if (currentFormType === 'students' && currentDepartment) {
+            if (departmentData[currentDepartment].students.length > 0) {
+                departmentData[currentDepartment].students.forEach((item, index) => {
+                    rows.push(`
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.year}</td>
+                            <td>
+                                <button onclick="editRow('${currentDepartment}', 'students', ${index})">Edit</button>
+                                <button onclick="deleteRow('${currentDepartment}', 'students', ${index})">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+        }
+
+        tableBody.innerHTML = rows.join('');
+        document.getElementById('dataList').style.display = 'block'; // Show the data list
+    }
+
+    // Function to show department details
+    function showDepartmentDetails(department) {
+        document.querySelectorAll('.departmentDetails').forEach(detail => detail.style.display = 'none');
+        document.getElementById(department + 'DepartmentDetails').style.display = 'block';
+    }
+
+    // Function to show faculty data
+    function showFacultyData(department) {
+        document.querySelectorAll('.sub-tab-content').forEach(content => content.style.display = 'none');
+        document.getElementById(department + 'FacultyData').style.display = 'block';
+
+        // Populate the faculty data table
+        const tbody = document.getElementById(department + 'FacultyDataBody');
+        tbody.innerHTML = '';
+        departmentData[department].faculty.forEach(item => {
+            const row = `<tr><td>${item.name}</td><td>${item.year}</td></tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Function to show student data
+    function showStudentData(department) {
+        document.querySelectorAll('.sub-tab-content').forEach(content => content.style.display = 'none');
+        document.getElementById(department + 'StudentData').style.display = 'block';
+
+        // Populate the student data table
+        const tbody = document.getElementById(department + 'StudentDataBody');
+        tbody.innerHTML = '';
+        departmentData[department].students.forEach(item => {
+            const row = `<tr><td>${item.name}</td><td>${item.year}</td></tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Placeholder functions for edit and delete actions
+    function editRow(department, type, index) {
+        alert(`Edit function for ${type} at index ${index} in ${department} department is not implemented yet.`);
+    }
+
+    function deleteRow(department, type, index) {
+        if (confirm(`Are you sure you want to delete this ${type} entry?`)) {
+            departmentData[department][type].splice(index, 1);
+            saveToLocalStorage(); // Save to localStorage
+            displayDataList(); // Refresh the list after deletion
+            alert(`${type.charAt(0).toUpperCase() + type.slice(1)} entry deleted.`);
+        }
+    }
+
+    // Function to save data to local storage
+    function saveToLocalStorage() {
+        localStorage.setItem('departmentData', JSON.stringify(departmentData));
+    }
+    
+    // Load data from local storage on page load
+    window.onload = function() {
+        const savedData = localStorage.getItem('departmentData');
+        if (savedData) {
+            Object.assign(departmentData, JSON.parse(savedData));
+        }
+    };
+    </script>
+</body>
+</html>
